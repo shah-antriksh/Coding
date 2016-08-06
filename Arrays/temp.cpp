@@ -1,93 +1,54 @@
-// C++ program to find minimum number of swaps required so that
-// all pairs become adjacent.
-#include<bits/stdc++.h>
+/* C++ program to count number of sub-arrays
+with even sum using an efficient algorithm
+Time Complexity - O(N)
+Space Complexity - O(1)*/
+#include<iostream>
 using namespace std;
-
-// This function updates indexes of elements 'a' and 'b'
-void updateindex(int index[], int a, int ai, int b, int bi)
+ 
+int countEvenSum(int arr[], int n)
 {
-	index[a] = ai;
-	index[b] = bi;
+    // A temporary array of size 2. temp[0] is
+    // going to store count of even subarrays
+    // and temp[1] count of odd.
+    // temp[0] is initialized as 1 because there
+    // a single even element is also counted as
+    // a subarray
+    int temp[2] = {1, 0};
+ 
+    // Initialize count.  sum is sum of elements
+    // under modulo 2 and ending with arr[i].
+    int result = 0, sum = 0;
+ 
+    // i'th iteration computes sum of arr[0..i]
+    // under modulo 2 and increments even/odd count
+    // according to sum's value
+    for (int i=0; i<=n-1; i++)
+    {
+        // 2 is added to handle negative numbers
+        sum = ( (sum + arr[i]) % 2 + 2) % 2;
+ 
+        // Increment even/odd count
+        temp[sum]++;
+    }
+ 
+    // Use handshake lemma to count even subarrays
+    // (Note that an even cam be formed by two even
+    // or two odd)
+	cout<<temp[0]<<temp[1];
+    result = result + (temp[0]*(temp[0]-1)/2);
+    result = result + (temp[1]*(temp[1]-1)/2);
+ 
+    return (result);
 }
-
-// This function returns minimum number of swaps required to arrange
-// all elements of arr[i..n] become aranged
-int minSwapsUtil(int arr[], int pairs[], int index[], int i, int n)
-{
-	// If all pairs procesed so no swapping needed return 0
-	if (i > n) return 0;
-
-	// If current pair is valid so DO NOT DISTURB this pair
-	// and move ahead.
-	if (pairs[arr[i]] == arr[i+1])
-		return minSwapsUtil(arr, pairs, index, i+2, n);
-
-	// If we reach here, then arr[i] and arr[i+1] don't form a pair
-
-	// Swap pair of arr[i] with arr[i+1] and recursively compute
-	// minimum swap required if this move is made.
-	int one = arr[i+1];
-	int indextwo = i+1;
-	int indexone = index[pairs[arr[i]]];
-	int two = arr[index[pairs[arr[i]]]];
-	swap(arr[i+1], arr[indexone]);
-	updateindex(index, one, indexone, two, indextwo);
-	int a = minSwapsUtil(arr, pairs, index, i+2, n);
-
-	// Backtrack to previous configuration. Also restore the
-	// previous indices, of one and two
-	swap(arr[i+1], arr[indexone]);
-	updateindex(index, one, indextwo, two, indexone);
-	one = arr[i], indexone = index[pairs[arr[i+1]]];
-
-	// Now swap arr[i] with pair of arr[i+1] and recursively
-	// compute minimum swaps required for the subproblem
-	// after this move
-	two = arr[index[pairs[arr[i+1]]]], indextwo = i;
-	swap(arr[i], arr[indexone]);
-	updateindex(index, one, indexone, two, indextwo);
-	int b = minSwapsUtil(arr, pairs, index, i+2, n);
-
-	// Backtrack to previous configuration. Also restore
-	// the previous indices, of one and two
-	swap(arr[i], arr[indexone]);
-	updateindex(index, one, indextwo, two, indexone);
-
-	// Return minimum of two cases
-	return 1 + min(a, b);
-}
-
-// Returns minimum swaps required
-int minSwaps(int n, int pairs[], int arr[])
-{
-	int index[2*n + 1]; // To store indices of array elements
-
-	// Store index of each element in array index
-	for (int i = 1; i <= 2*n; i++)
-		index[arr[i]] = i;
-
-	// Call the recursive function
-	return minSwapsUtil(arr, pairs, index, 1, 2*n);
-}
-
-// Driver program
+ 
+// Driver code
 int main()
 {
-	// For simplicity, it is assumed that arr[0] is
-	// not used. The elements from index 1 to n are
-	// only valid elements
-	int arr[] = {0, 3, 5, 6, 4, 1, 2};
-
-	// if (a, b) is pair than we have assigned elements
-	// in array such that pairs[a] = b and pairs[b] = a
-	int pairs[] = {0, 3, 6, 1, 5, 4, 2};
-	int m = sizeof(arr)/sizeof(arr[0]);
-
-	int n = m/2; // Number of pairs n is half of total elements
-
-	// If there are n elements in array, then
-	// there are n pairs
-	cout << "Min swaps required is " << minSwaps(n, pairs, arr);
-	return 0;
+    int arr[] = {1, 2, 2, 3, 4, 1};
+    int n = sizeof (arr) / sizeof (arr[0]);
+ 
+    cout << "The Number of Subarrays with even"
+            " sum is " << countEvenSum (arr, n);
+ 
+    return (0);
 }
-
